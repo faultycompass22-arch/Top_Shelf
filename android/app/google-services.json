@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "512051262332",
+    "project_id": "topshelf-aaa-2026",
+    "storage_bucket": "topshelf-aaa-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512051262332:android:181a35455de185ec64aaf9",
+        "android_client_info": {
+          "package_name": "com.example.top_shelf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXhVulVKxrf5R4KPvzBupMg2ff9YqhnR4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
