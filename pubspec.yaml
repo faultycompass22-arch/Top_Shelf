@@ -1,6 +1,6 @@
 name: top_shelf
 description: "Top Shelf — private access for verified members."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -15,12 +15,26 @@ dependencies:
 
   # Routing
   go_router: ^14.2.0
+
+  # State
+  provider: ^6.1.2
+
+  # Local storage
+  shared_preferences: ^2.2.3
+
+  # Firebase
   firebase_core: ^2.32.0
+  firebase_auth: ^4.19.6
+  cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.7
+
+  # Stripe + http
+  flutter_stripe: ^10.1.1
+  http: ^1.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
   flutter_lints: ^6.0.0
 
 flutter:

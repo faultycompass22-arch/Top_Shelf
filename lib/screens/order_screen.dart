@@ -1,88 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/menu_item_card.dart';
+import '../models/menu_item.dart';
+import '../state/menu_controller.dart' as app_menu;
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
 
-  // =========================
-  // TWEAK: Layout knobs (edit these)
-  // =========================
-  static const double kHeroExpandedHeight = 260; // TWEAK: hero image height
-  static const double kExploreHeaderTopPad = 8; // TWEAK: move Explore Menu closer to hero (smaller = closer)
-  static const double kExploreHeaderBottomPad = 14;
-  static const double kExploreFontSize = 34; // TWEAK: Explore Menu font size
-  static const double kGridSidePadding = 18; // TWEAK: left/right padding
-  static const double kGridSpacing = 16; // TWEAK: tile spacing
-  static const double kTileRadius = 22; // TWEAK: tile roundness
+  @override
+  State<OrderScreen> createState() => _OrderScreenState();
+}
 
-  // Demo data (swap later with your real menu list)
-  static const int _demoCount = 12;
+class _OrderScreenState extends State<OrderScreen> {
+  static const double kHeroHeight = 260;
+  static const double kFlowerBarHeight = 64;
+  static const double kTileRadius = 18;
+
+  static const Color kEmerald = Color(0xFF0F5C4A);
+  static const Color kWarmOffWhite = Color(0xFFF6F1E7);
+
+  static const int _tileCount = 4;
+
+  final app_menu.MenuController _menu = app_menu.MenuController();
+
+  @override
+  void initState() {
+    super.initState();
+    _menu.load();
+  }
+
+  @override
+  void dispose() {
+    _menu.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // =========================
-    // PAGE STRUCTURE
-    // - SliverAppBar = hero + hamburger + account button
-    // - Pinned header = "Explore Menu"
-    // - Body = grid that scrolls UNDER the pinned header
-    // =========================
     return Scaffold(
       drawer: _buildDrawer(context),
-      body: NestedScrollView(
-        headerSliverBuilder: (context, _) => [
-          _buildHeroSliverAppBar(context),
-          _buildExplorePinnedHeader(),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          _buildHero(),
+          _buildFlowerHeaderBar(context),
+          Expanded(
+            child: Container(
+              color: kWarmOffWhite,
+              padding: const EdgeInsets.all(20),
+              child: AnimatedBuilder(
+                animation: _menu,
+                builder: (context, _) => _buildTiles(context),
+              ),
+            ),
+          ),
         ],
-        body: _buildGrid(context),
       ),
     );
   }
 
-  // =========================
-  // HERO / TOP BAR
-  // =========================
-  SliverAppBar _buildHeroSliverAppBar(BuildContext context) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: Colors.black,
-      expandedHeight: kHeroExpandedHeight, // TWEAK: hero height (above)
-      floating: false,
-      pinned: false,
-      flexibleSpace: Stack(
+  Widget _buildHero() {
+    return SizedBox(
+      height: kHeroHeight,
+      width: double.infinity,
+      child: Stack(
         fit: StackFit.expand,
         children: [
-          // HERO IMAGE
           Image.asset(
             'assets/aaa_full_logo.png',
             fit: BoxFit.cover,
           ),
-
-          // subtle dark overlay so icons look good
-          Container(color: Colors.black.withOpacity(0.18)),
-
-          // TOP ROW ICONS (hamburger + account)
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // HAMBURGER
-                  IconButton(
-                    // TWEAK: icon size
-                    iconSize: 26,
-                    icon: const Icon(Icons.menu, color: Colors.white),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  ),
-
-                  // ACCOUNT (goes to /account)
-                  IconButton(
-                    iconSize: 24,
-                    icon: const Icon(Icons.person_outline, color: Colors.white),
-                    onPressed: () => context.push('/account'),
-                  ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.35),
+                  Colors.black.withValues(alpha: 0.15),
                 ],
               ),
             ),
@@ -92,81 +87,162 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  // =========================
-  // PINNED "EXPLORE MENU" HEADER
-  // =========================
-  SliverPersistentHeader _buildExplorePinnedHeader() {
-    return SliverPersistentHeader(
-      pinned: true,
-      delegate: _PinnedHeaderDelegate(
-        minHeight: 72,
-        maxHeight: 72,
-        child: Container(
-          color: Colors.black,
-          padding: EdgeInsets.only(
-            top: kExploreHeaderTopPad, // TWEAK: closer/farther from hero
-            bottom: kExploreHeaderBottomPad,
+  Widget _buildFlowerHeaderBar(BuildContext context) {
+    return Container(
+      height: kFlowerBarHeight,
+      width: double.infinity,
+      color: kEmerald,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Builder(
+                builder: (ctx) => IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                  onPressed: () => Scaffold.of(ctx).openDrawer(),
+                ),
+              ),
+              const Text(
+                'Flower',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.person_outline, color: Colors.white),
+                onPressed: () => context.push('/account'),
+              ),
+            ],
           ),
-          alignment: Alignment.bottomCenter,
-          child: Text(
-            'Explore Menu',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: kExploreFontSize, // TWEAK: font size
-              fontWeight: FontWeight.w800,
-              height: 1.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTiles(BuildContext context) {
+    final List<MenuItem> data = _menu.items;
+    final tiles = List<MenuItem?>.generate(
+      _tileCount,
+          (i) => i < data.length ? data[i] : null,
+    );
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _tileCount,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 18,
+        crossAxisSpacing: 18,
+        childAspectRatio: 1,
+      ),
+      itemBuilder: (context, index) {
+        final item = tiles[index];
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(kTileRadius),
+            border: Border.all(color: kEmerald, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(kTileRadius),
+            onTap: item == null
+                ? null
+                : () {
+              context.push(
+                '/item',
+                extra: {
+                  'id': item.id,
+                  'title': item.title,
+                  'description': item.description,
+                  'priceCents': item.priceCents,
+                  'imageUrl': item.imageUrl,
+                  'category': item.category,
+                  'coaUrl': item.coaUrl,
+                },
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(kTileRadius),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _TileImage(url: item?.imageUrl),
+                  ),
+                  Positioned(
+                    left: 12,
+                    right: 12,
+                    bottom: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.70),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        item?.title.isNotEmpty == true
+                            ? item!.title
+                            : (item == null ? '—' : 'Item'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_menu.loading)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        alignment: Alignment.center,
+                        child: const SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  // =========================
-  // GRID
-  // =========================
-  Widget _buildGrid(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: GridView.builder(
-        padding: const EdgeInsets.only(top: 6) +
-            const EdgeInsets.symmetric(horizontal: kGridSidePadding) +
-            const EdgeInsets.only(bottom: 140), // keeps tiles above bag bar + nav
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: kGridSpacing,
-          crossAxisSpacing: kGridSpacing,
-          childAspectRatio: 1,
-        ),
-        itemCount: _demoCount,
-        itemBuilder: (context, index) {
-          return MenuItemCard(
-            radius: kTileRadius, // TWEAK: tile roundness
-            imagePath: 'assets/menu/flower.png',
-            onTap: () {
-              // Item details route
-              context.push('/item', extra: {'index': index});
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  // =========================
-  // DRAWER (Hamburger)
-  // =========================
   Drawer _buildDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: const Color(0xFF0B0B0B),
       child: SafeArea(
         child: ListView(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             const ListTile(
               title: Text(
                 'AAA Cannabis Delivery',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               subtitle: Text(
                 'Private access',
@@ -176,17 +252,13 @@ class OrderScreen extends StatelessWidget {
             const Divider(color: Colors.white12),
             ListTile(
               leading: const Icon(Icons.person_outline, color: Colors.white),
-              title: const Text('Account', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Account',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/account');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.help_outline, color: Colors.white),
-              title: const Text('Support', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
               },
             ),
           ],
@@ -196,32 +268,51 @@ class OrderScreen extends StatelessWidget {
   }
 }
 
-class _PinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _PinnedHeaderDelegate({
-    required this.minHeight,
-    required this.maxHeight,
-    required this.child,
-  });
-
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
+class _TileImage extends StatelessWidget {
+  final String? url;
+  const _TileImage({required this.url});
 
   @override
-  double get minExtent => minHeight;
+  Widget build(BuildContext context) {
+    final u = (url ?? '').trim();
+    if (u.isEmpty) {
+      return Container(
+        color: const Color(0xFFF0F0F0),
+        alignment: Alignment.center,
+        child: const Icon(
+          Icons.local_florist,
+          size: 44,
+          color: Colors.black26,
+        ),
+      );
+    }
 
-  @override
-  double get maxExtent => maxHeight;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(_PinnedHeaderDelegate oldDelegate) {
-    return minHeight != oldDelegate.minHeight ||
-        maxHeight != oldDelegate.maxHeight ||
-        child != oldDelegate.child;
+    return Image.network(
+      u,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: const Color(0xFFF0F0F0),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.broken_image_outlined,
+            size: 44,
+            color: Colors.black26,
+          ),
+        );
+      },
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Container(
+          color: const Color(0xFFF0F0F0),
+          alignment: Alignment.center,
+          child: const SizedBox(
+            height: 22,
+            width: 22,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        );
+      },
+    );
   }
 }
