@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-/// Simple in-memory gate (persistence later).
-class AgeGateState {
-  static bool verified21 = false;
-  static bool denied = false;
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AgeGateScreen extends StatelessWidget {
   const AgeGateScreen({super.key});
+
+  Future<void> _setVerified(BuildContext context, bool value) async {
+    final router = GoRouter.of(context);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('age_verified', value);
+
+    if (value) {
+      router.go('/app');
+    } else {
+      router.go('/age-denied');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +28,6 @@ class AgeGateScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-
-              // 🟣 FONT-TWEAK: title styling
               const Text(
                 '21+ Only',
                 textAlign: TextAlign.center,
@@ -33,18 +38,13 @@ class AgeGateScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-
               const Text(
                 'You must be 21 years of age or older to enter.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70, fontSize: 16),
               ),
-
               const Spacer(),
-
-              // 🔵 UI-TWEAK: button spacing
               ElevatedButton(
-                // 🟢 COLOR-TWEAK: button colors
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD7B46A),
                   foregroundColor: Colors.black,
@@ -53,15 +53,10 @@ class AgeGateScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                onPressed: () {
-                  AgeGateState.verified21 = true;
-                  AgeGateState.denied = false;
-                  context.go('/login');
-                },
+                onPressed: () => _setVerified(context, true),
                 child: const Text('Yes, I am 21+'),
               ),
               const SizedBox(height: 12),
-
               OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -71,11 +66,7 @@ class AgeGateScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                onPressed: () {
-                  AgeGateState.denied = true;
-                  AgeGateState.verified21 = false;
-                  context.go('/age-denied');
-                },
+                onPressed: () => _setVerified(context, false),
                 child: const Text('No'),
               ),
             ],
