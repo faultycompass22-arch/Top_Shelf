@@ -14,9 +14,9 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   static const double kHeroHeight = 260;
   static const double kFlowerBarHeight = 64;
-  static const double kTileRadius = 18;
+  static const double kTileRadius = 20;
 
-  static const Color kEmerald = Color(0xFF0F5C4A);
+  static const Color kEyeGreen = Color(0xFF1E6B52);
   static const Color kWarmOffWhite = Color(0xFFF6F1E7);
 
   static const int _tileCount = 4;
@@ -50,7 +50,7 @@ class _OrderScreenState extends State<OrderScreen> {
               padding: const EdgeInsets.all(20),
               child: AnimatedBuilder(
                 animation: _menu,
-                builder: (context, _) => _buildTiles(context),
+                builder: (context, child) => _buildTiles(context),
               ),
             ),
           ),
@@ -91,32 +91,45 @@ class _OrderScreenState extends State<OrderScreen> {
     return Container(
       height: kFlowerBarHeight,
       width: double.infinity,
-      color: kEmerald,
+      color: kEyeGreen,
       child: SafeArea(
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Builder(
                 builder: (ctx) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
+                  icon: const Icon(Icons.menu_rounded, color: Colors.white),
                   onPressed: () => Scaffold.of(ctx).openDrawer(),
                 ),
               ),
-              const Text(
-                'Flower',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'Flower',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.person_outline, color: Colors.white),
-                onPressed: () => context.push('/account'),
+              InkWell(
+                onTap: () => context.push('/account'),
+                borderRadius: BorderRadius.circular(8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  child: Text(
+                    'Hi, Member',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -127,6 +140,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   Widget _buildTiles(BuildContext context) {
     final List<MenuItem> data = _menu.items;
+
     final tiles = List<MenuItem?>.generate(
       _tileCount,
           (i) => i < data.length ? data[i] : null,
@@ -137,90 +151,78 @@ class _OrderScreenState extends State<OrderScreen> {
       itemCount: _tileCount,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 18,
-        crossAxisSpacing: 18,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
         final item = tiles[index];
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(kTileRadius),
-            border: Border.all(color: kEmerald, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 10,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(kTileRadius),
-            onTap: item == null
-                ? null
-                : () {
-              context.push(
-                '/item',
-                extra: {
-                  'id': item.id,
-                  'title': item.title,
-                  'description': item.description,
-                  'priceCents': item.priceCents,
-                  'imageUrl': item.imageUrl,
-                  'category': item.category,
-                  'coaUrl': item.coaUrl,
-                },
-              );
-            },
-            child: ClipRRect(
+        return InkWell(
+          borderRadius: BorderRadius.circular(kTileRadius),
+          onTap: item == null
+              ? null
+              : () {
+            context.push('/item', extra: item);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(kTileRadius),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _TileImage(url: item?.imageUrl),
-                  ),
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.70),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        item?.title.isNotEmpty == true
-                            ? item!.title
-                            : (item == null ? '—' : 'Item'),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (_menu.loading)
+              border: Border.all(color: kEyeGreen, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.14),
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(kTileRadius - 6),
+                child: Stack(
+                  children: [
                     Positioned.fill(
+                      child: _TileImage(url: item?.imageUrl),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
                       child: Container(
-                        color: Colors.white.withValues(alpha: 0.35),
-                        alignment: Alignment.center,
-                        child: const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        color: Colors.white.withValues(alpha: 0.92),
+                        child: Text(
+                          item?.title ?? '—',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
-                ],
+                    if (_menu.loading)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.white.withValues(alpha: 0.30),
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -251,7 +253,8 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             const Divider(color: Colors.white12),
             ListTile(
-              leading: const Icon(Icons.person_outline, color: Colors.white),
+              leading: const Icon(Icons.shopping_bag_rounded,
+                  color: Colors.white),
               title: const Text(
                 'Account',
                 style: TextStyle(color: Colors.white),
@@ -275,12 +278,13 @@ class _TileImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final u = (url ?? '').trim();
+
     if (u.isEmpty) {
       return Container(
         color: const Color(0xFFF0F0F0),
         alignment: Alignment.center,
         child: const Icon(
-          Icons.local_florist,
+          Icons.shopping_bag_rounded,
           size: 44,
           color: Colors.black26,
         ),

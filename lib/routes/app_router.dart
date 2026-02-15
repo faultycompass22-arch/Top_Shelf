@@ -1,5 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/menu_item.dart';
 
 import '../screens/app_shell_screen.dart';
 import '../screens/order_screen.dart';
@@ -21,11 +24,12 @@ Future<bool> _isAgeVerified() async {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/app',
-
   redirect: (context, state) async {
     final verified = await _isAgeVerified();
-    final goingToAge = state.uri.path == '/age';
-    final goingToDenied = state.uri.path == '/age-denied';
+    final path = state.uri.path;
+
+    final goingToAge = path == '/age';
+    final goingToDenied = path == '/age-denied';
 
     if (!verified && !goingToAge && !goingToDenied) {
       return '/age';
@@ -37,7 +41,6 @@ final GoRouter appRouter = GoRouter(
 
     return null;
   },
-
   routes: [
     GoRoute(
       path: '/age',
@@ -49,8 +52,7 @@ final GoRouter appRouter = GoRouter(
     ),
 
     ShellRoute(
-      builder: (context, state, child) =>
-          AppShellScreen(child: child),
+      builder: (context, state, child) => AppShellScreen(child: child),
       routes: [
         GoRoute(
           path: '/app',
@@ -71,12 +73,17 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
+    // ✅ Item detail expects a MenuItem passed in `extra`
     GoRoute(
       path: '/item',
       builder: (context, state) {
-        final payload =
-            (state.extra as Map<String, dynamic>?) ?? {};
-        return ItemDetailScreen(payload: payload);
+        final extra = state.extra;
+        if (extra is! MenuItem) {
+          return const _RouteErrorScreen(
+            message: 'Missing MenuItem payload for /item',
+          );
+        }
+        return ItemDetailScreen(item: extra);
       },
     ),
 
@@ -87,13 +94,28 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: '/legal',
-      builder: (context, state) =>
-      const LegalDisclaimerScreen(),
+      builder: (context, state) => const LegalDisclaimerScreen(),
     ),
 
+    // ✅ COA screen (safe compile version for now)
     GoRoute(
       path: '/coa',
       builder: (context, state) => const CoaScreen(),
     ),
   ],
 );
+
+class _RouteErrorScreen extends StatelessWidget {
+  final String message;
+  const _RouteErrorScreen({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Center(
+        child: Text(message),
+      ),
+    );
+  }
+}

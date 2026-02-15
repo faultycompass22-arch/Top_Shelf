@@ -2,59 +2,48 @@ import 'package:flutter/material.dart';
 
 class BagBar extends StatelessWidget {
   final int count;
+  final int totalCents;
   final VoidCallback onTap;
 
   const BagBar({
     super.key,
     required this.count,
+    required this.totalCents,
     required this.onTap,
   });
 
-  static const Color kEmerald = Color(0xFF0F5C4A);
-  static const Color kGold = Color(0xFFD7B46A);
+  static const Color kEyeGreen = Color(0xFF1E6B52);
+
+  String _money(int cents) => '\$${(cents / 100).toStringAsFixed(2)}';
 
   @override
   Widget build(BuildContext context) {
+    if (count <= 0) return const SizedBox.shrink();
+
     return SafeArea(
       top: false,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          height: 64,
-          decoration: const BoxDecoration(
-            color: kEmerald,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          height: 66,
+          decoration: const BoxDecoration(color: kEyeGreen),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Row(
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(
-                    Icons.shopping_bag_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                  Positioned(
-                    top: 6,
-                    right: 2,
-                    child: Icon(
-                      Icons.remove_red_eye,
-                      size: 14,
-                      color: kGold,
-                    ),
-                  ),
-                ],
+              const Icon(
+                Icons.shopping_bag_rounded,
+                color: Colors.white,
+                size: 28,
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '$count item${count == 1 ? '' : 's'} in bag',
+                  '$count item${count == 1 ? '' : 's'} • ${_money(totalCents)}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -62,10 +51,10 @@ class BagBar extends StatelessWidget {
                 'View Cart',
                 style: TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               const Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
