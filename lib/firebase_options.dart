@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:512051262332:android:181a35455de185ec64aaf9',
     messagingSenderId: '512051262332',
     projectId: 'topshelf-aaa-2026',
+    databaseURL: 'https://topshelf-aaa-2026-default-rtdb.firebaseio.com',
     storageBucket: 'topshelf-aaa-2026.firebasestorage.app',
   );
 
@@ -63,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '512051262332',
     projectId: 'topshelf-aaa-2026',
     authDomain: 'topshelf-aaa-2026.firebaseapp.com',
+    databaseURL: 'https://topshelf-aaa-2026-default-rtdb.firebaseio.com',
     storageBucket: 'topshelf-aaa-2026.firebasestorage.app',
   );
 
