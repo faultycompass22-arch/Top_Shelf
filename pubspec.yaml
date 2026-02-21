@@ -1,5 +1,5 @@
-name: top_shelf
-description: Top Shelf Premium Menu
+name: topshelf
+description: Top Shelf Marketplace - Lean Premium Menu Build
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -11,27 +11,24 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.6
-
   # Firebase
   firebase_core: ^2.27.0
-  cloud_firestore: ^4.15.0
+  cloud_firestore: ^4.15.8
 
-  # State (simple + lean)
-  provider: ^6.1.2
-
-  # Launch SMS / Call
+  # External actions (SMS / Call / Browser)
   url_launcher: ^6.2.5
+
+  # Icons
+  cupertino_icons: ^1.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^3.0.1
+  flutter_lints: ^3.0.2
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
-    - assets/menu/
