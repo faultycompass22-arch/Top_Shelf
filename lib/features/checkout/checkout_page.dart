@@ -1,10 +1,8 @@
-// lib/features/checkout/checkout_page.dart
-
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../state/cart_store.dart';
-import '../../utils/launchers.dart';
+import '../../components/utils/launchers.dart';
 import '../menu/image_key_map.dart';
 
 class CheckoutPage extends StatelessWidget {
@@ -18,7 +16,6 @@ class CheckoutPage extends StatelessWidget {
         final lines = CartStore.instance.lines;
 
         return Theme(
-          // Force “back to reality” light theme for this page only
           data: Theme.of(context).copyWith(
             brightness: Brightness.light,
             scaffoldBackgroundColor: const Color(0xFFFAFAFA),
@@ -75,8 +72,8 @@ class CheckoutPage extends StatelessWidget {
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                  AppRadius.md),
+                              borderRadius:
+                              BorderRadius.circular(AppRadius.md),
                               child: SizedBox(
                                 width: 62,
                                 height: 62,
@@ -124,8 +121,6 @@ class CheckoutPage extends StatelessWidget {
                     },
                   ),
                 ),
-
-                // Total + actions
                 Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -159,8 +154,6 @@ class CheckoutPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-
-                      // Delivery / payment placeholders (Tonight mode)
                       const _PlaceholderRow(
                         title: 'Delivery info',
                         subtitle: 'Available after ordering by text/call',
@@ -171,14 +164,13 @@ class CheckoutPage extends StatelessWidget {
                         subtitle: 'No payments in-app tonight',
                       ),
                       const SizedBox(height: 14),
-
                       Row(
                         children: [
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                final body = CartStore.instance
-                                    .buildOrderText();
+                                final body =
+                                CartStore.instance.buildOrderText();
                                 launchTextOrder(body: body);
                               },
                               child: const Text('Text to Order'),
@@ -190,8 +182,8 @@ class CheckoutPage extends StatelessWidget {
                               onPressed: launchCallOrder,
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(
-                                    color:
-                                    Color.fromRGBO(0, 0, 0, 0.12)),
+                                  color: Color.fromRGBO(0, 0, 0, 0.12),
+                                ),
                                 foregroundColor: AppColors.background,
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 14),

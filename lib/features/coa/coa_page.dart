@@ -1,8 +1,7 @@
-// lib/features/coa/coa_page.dart
-
 import 'package:flutter/material.dart';
+
 import '../../theme/tokens.dart';
-import '../../utils/launchers.dart';
+import '../../components/utils/launchers.dart';
 import 'coa_details_page.dart';
 
 class CoaPage extends StatelessWidget {
@@ -28,7 +27,6 @@ class CoaPage extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-
             Container(
               width: 74,
               height: 74,
@@ -43,9 +41,7 @@ class CoaPage extends StatelessWidget {
                 size: 34,
               ),
             ),
-
             const SizedBox(height: 18),
-
             const Text(
               'Certificates of Analysis',
               textAlign: TextAlign.center,
@@ -55,9 +51,7 @@ class CoaPage extends StatelessWidget {
                 fontSize: 20,
               ),
             ),
-
             const SizedBox(height: 10),
-
             const Text(
               'View product lab reports and compliance information.',
               textAlign: TextAlign.center,
@@ -67,9 +61,7 @@ class CoaPage extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -83,9 +75,7 @@ class CoaPage extends StatelessWidget {
                 child: const Text('View COA'),
               ),
             ),
-
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
@@ -103,7 +93,6 @@ class CoaPage extends StatelessWidget {
                 ),
               ],
             ),
-
             const Spacer(),
           ],
         ),

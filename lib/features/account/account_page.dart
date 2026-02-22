@@ -1,9 +1,7 @@
-// lib/features/account/account_page.dart
-
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
-import '../../utils/launchers.dart';
+import '../../components/utils/launchers.dart';
 import '../../core/constants/app_constants.dart';
 
 class AccountPage extends StatelessWidget {
@@ -48,7 +46,6 @@ class AccountPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -88,9 +85,7 @@ class AccountPage extends StatelessWidget {
                   ],
                 ),
               ),
-
               const Spacer(),
-
               Row(
                 children: [
                   Expanded(
@@ -106,8 +101,10 @@ class AccountPage extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.cardBorder),
                         foregroundColor: AppColors.textPrimary,
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                         ),

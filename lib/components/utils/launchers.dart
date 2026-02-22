@@ -1,46 +1,31 @@
-// lib/utils/launchers.dart
-
 import 'package:url_launcher/url_launcher.dart';
-import '../core/constants/app_constants.dart';
+import '../../core/constants/app_constants.dart';
 
-/// Text-to-order + Call-to-order launchers.
-/// Set your phone number in:
-///   lib/core/constants/app_constants.dart  -> AppConstants.orderPhone
+Future<void> launchTextOrder({String? body}) async {
+  final message =
+  (body != null && body.trim().isNotEmpty)
+      ? body.trim()
+      : "Hi! I'd like to place an order from ${AppConstants.storeName}.";
 
-Future<void> launchTextOrder({String? productName, String? body}) async {
-  final phone = AppConstants.orderPhone;
-
-  final message = body ??
-      (productName == null || productName.trim().isEmpty
-          ? "${AppConstants.smsGreeting}."
-          : "${AppConstants.smsGreeting} $productName.");
-
-  // sms:+1....?body=...
   final uri = Uri(
     scheme: 'sms',
-    path: phone,
-    queryParameters: <String, String>{
-      'body': message,
-    },
+    path: AppConstants.orderPhone,
+    queryParameters: {'body': message},
   );
 
-  await _launch(uri);
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 Future<void> launchCallOrder() async {
-  final phone = AppConstants.orderPhone;
-  final uri = Uri(scheme: 'tel', path: phone);
-  await _launch(uri);
+  final uri = Uri(
+    scheme: 'tel',
+    path: AppConstants.orderPhone,
+  );
+
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 Future<void> launchUrlExternal(String url) async {
-  final uri = Uri.tryParse(url);
-  if (uri == null) return;
-  await _launch(uri);
-}
-
-Future<void> _launch(Uri uri) async {
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
+  final uri = Uri.parse(url.trim());
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }

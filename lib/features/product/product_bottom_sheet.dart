@@ -6,11 +6,10 @@ import '../../theme/tokens.dart';
 import '../../state/cart_store.dart';
 import '../menu/menu_item.dart';
 import '../menu/image_key_map.dart';
-import '../../utils/launchers.dart';
+import '../../components/utils/launchers.dart';
 
 class ProductBottomSheet extends StatefulWidget {
   const ProductBottomSheet({super.key, required this.item});
-
   final MenuItem item;
 
   @override
@@ -19,6 +18,14 @@ class ProductBottomSheet extends StatefulWidget {
 
 class _ProductBottomSheetState extends State<ProductBottomSheet> {
   int _qty = 1;
+
+  String _buildTextOrderMessage(MenuItem item, int qty) {
+    final price = item.price.toStringAsFixed(2);
+    return 'Order request:\n'
+        '- ${item.name}\n'
+        '- Qty: $qty\n'
+        '- Price: \$$price\n';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,55 +119,6 @@ class _ProductBottomSheetState extends State<ProductBottomSheet> {
 
                     const SizedBox(height: 14),
 
-                    // Effects
-                    if (item.effects.isNotEmpty) ...[
-                      const Text(
-                        'Effects',
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: item.effects
-                            .take(8)
-                            .map(
-                              (e) => _Pill(
-                            text: e,
-                            bg: AppColors.surface2,
-                            fg: AppColors.textPrimary,
-                            border: AppColors.cardBorder,
-                          ),
-                        )
-                            .toList(),
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-
-                    // Scent
-                    if ((item.scent ?? '').trim().isNotEmpty) ...[
-                      Row(
-                        children: [
-                          const Icon(Icons.local_florist,
-                              size: 16, color: AppColors.textMuted),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              item.scent!,
-                              style: const TextStyle(
-                                color: AppColors.textMuted,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-
                     // Description
                     if ((item.description ?? '').trim().isNotEmpty) ...[
                       const Text(
@@ -213,7 +171,7 @@ class _ProductBottomSheetState extends State<ProductBottomSheet> {
 
                     const SizedBox(height: 14),
 
-                    // COA button
+                    // COA block
                     _CoaBlock(item: item),
 
                     const SizedBox(height: 18),
@@ -221,7 +179,6 @@ class _ProductBottomSheetState extends State<ProductBottomSheet> {
                 ),
               ),
 
-              // Bottom actions (qty + add to cart + text/call)
               _BottomActions(
                 qty: _qty,
                 onDec: () => setState(() => _qty = (_qty - 1).clamp(1, 99)),
@@ -230,7 +187,9 @@ class _ProductBottomSheetState extends State<ProductBottomSheet> {
                   CartStore.instance.add(item, qty: _qty);
                   Navigator.of(context).pop();
                 },
-                onText: () => launchTextOrder(productName: item.name),
+                onText: () => launchTextOrder(
+                  body: _buildTextOrderMessage(item, _qty),
+                ),
                 onCall: launchCallOrder,
               ),
             ],
@@ -261,9 +220,9 @@ class _BottomActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
-        border: const Border(top: BorderSide(color: AppColors.cardBorder)),
+        border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
       padding: const EdgeInsets.only(top: 12),
       child: Column(
@@ -453,7 +412,6 @@ class _CoaBlock extends StatelessWidget {
           TextButton(
             onPressed: () {
               if (hasCoa) {
-                // For tonight: open URL in browser (later can be overlay viewer)
                 launchUrlExternal(item.coaUrl!);
               } else {
                 showDialog(

@@ -1,7 +1,8 @@
-name: topshelf
-description: Top Shelf Marketplace - Lean Premium Menu Build
-publish_to: 'none'
+# pubspec.yaml
 
+name: top_shelf
+description: Top Shelf Menu App
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -12,23 +13,21 @@ dependencies:
     sdk: flutter
 
   # Firebase
-  firebase_core: ^2.27.0
-  cloud_firestore: ^4.15.8
+  firebase_core: ^3.1.0
+  cloud_firestore: ^5.0.0
 
-  # External actions (SMS / Call / Browser)
-  url_launcher: ^6.2.5
-
-  # Icons
-  cupertino_icons: ^1.0.6
+  # Launch SMS/Phone/URLs
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
 
   assets:
+    - assets/
     - assets/images/
+    - assets/menu/
