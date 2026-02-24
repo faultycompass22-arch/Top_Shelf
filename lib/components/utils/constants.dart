@@ -1,20 +1,17 @@
-class AppRoutes {
-  static const login = '/';
-  static const finishSignIn = '/finish-signin';
-  static const notInvited = '/not-invited';
+import 'package:flutter/material.dart';
 
-
-// App shell root tab
-  static const shell = '/app';
-
-
-// Admin
-  static const adminInvites = '/admin/invites';
-  static const adminMenu = '/admin/menu';
+class AppColors {
+  static const Color bg = Color(0xFF070707);
+  static const Color panel = Color(0xFF101010);
+  static const Color panel2 = Color(0xFF151515);
+  static const Color gold = Color(0xFFD2B06A);
+  static const Color gold2 = Color(0xFFB9923A);
+  static const Color text = Color(0xFFF2F2F2);
+  static const Color muted = Color(0xFFBDBDBD);
+  static const Color line = Color(0xFF242424);
 }
 
-
-class AppStrings {
-  static const appName = 'Top Shelf';
-  static const subtitle = 'Private access for verified members';
+class AppRadii {
+  static const double card = 18;
+  static const double pill = 999;
 }

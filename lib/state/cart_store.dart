@@ -1,107 +1,65 @@
 // lib/state/cart_store.dart
+
 import 'package:flutter/foundation.dart';
-
-import '../features/menu/menu_item.dart';
-
-class CartLine {
-  CartLine({
-    required this.item,
-    required this.qty,
-  });
-
-  final MenuItem item;
-  int qty;
-
-  double get lineTotal => item.price * qty;
-}
+import '../models/cart_item.dart';
 
 class CartStore extends ChangeNotifier {
-  CartStore._();
-  static final CartStore instance = CartStore._();
+  final List<CartItem> _items = [];
 
-  final List<CartLine> _lines = [];
+  List<CartItem> get items => List.unmodifiable(_items);
 
-  List<CartLine> get lines => List.unmodifiable(_lines);
+  int get totalItems =>
+      _items.fold(0, (sum, item) => sum + item.quantity);
 
-  int get totalQty {
-    var sum = 0;
-    for (final l in _lines) {
-      sum += l.qty;
-    }
-    return sum;
-  }
+  int get totalCents =>
+      _items.fold(0, (sum, item) => sum + (item.priceCents * item.quantity));
 
-  double get subtotal {
-    var sum = 0.0;
-    for (final l in _lines) {
-      sum += l.lineTotal;
-    }
-    return sum;
-  }
+  void addItem(CartItem item) {
+    final index = _items.indexWhere(
+          (e) =>
+      e.id == item.id &&
+          e.weightKey == item.weightKey,
+    );
 
-  int qtyFor(String menuItemId) {
-    final idx = _lines.indexWhere((l) => l.item.id == menuItemId);
-    if (idx < 0) return 0;
-    return _lines[idx].qty;
-  }
-
-  void add(MenuItem item, {int qty = 1}) {
-    if (qty <= 0) return;
-
-    final idx = _lines.indexWhere((l) => l.item.id == item.id);
-    if (idx >= 0) {
-      _lines[idx].qty += qty;
+    if (index != -1) {
+      _items[index] = _items[index].copyWith(
+        quantity: _items[index].quantity + item.quantity,
+      );
     } else {
-      _lines.add(CartLine(item: item, qty: qty));
+      _items.add(item);
     }
+
     notifyListeners();
   }
 
-  void setQty(MenuItem item, int qty) {
-    final idx = _lines.indexWhere((l) => l.item.id == item.id);
-    if (idx < 0) {
-      if (qty > 0) {
-        _lines.add(CartLine(item: item, qty: qty));
-        notifyListeners();
+  void removeItem(CartItem item) {
+    _items.removeWhere(
+          (e) =>
+      e.id == item.id &&
+          e.weightKey == item.weightKey,
+    );
+    notifyListeners();
+  }
+
+  void updateQuantity(CartItem item, int quantity) {
+    final index = _items.indexWhere(
+          (e) =>
+      e.id == item.id &&
+          e.weightKey == item.weightKey,
+    );
+
+    if (index != -1) {
+      if (quantity <= 0) {
+        _items.removeAt(index);
+      } else {
+        _items[index] = _items[index].copyWith(quantity: quantity);
       }
-      return;
-    }
-
-    if (qty <= 0) {
-      _lines.removeAt(idx);
       notifyListeners();
-      return;
     }
-
-    _lines[idx].qty = qty;
-    notifyListeners();
-  }
-
-  void inc(MenuItem item) => setQty(item, qtyFor(item.id) + 1);
-  void dec(MenuItem item) => setQty(item, qtyFor(item.id) - 1);
-
-  void remove(String menuItemId) {
-    _lines.removeWhere((l) => l.item.id == menuItemId);
-    notifyListeners();
   }
 
   void clear() {
-    _lines.clear();
+    _items.clear();
     notifyListeners();
-  }
-
-  /// Builds the prefilled SMS body for checkout
-  String buildOrderText({String greeting = "Hi, I'd like to order:"}) {
-    final buffer = StringBuffer();
-    buffer.writeln(greeting);
-    buffer.writeln();
-
-    for (final l in _lines) {
-      buffer.writeln("- ${l.qty}x ${l.item.name} (${l.item.type})  \$${l.item.price.toStringAsFixed(2)}");
-    }
-
-    buffer.writeln();
-    buffer.writeln("Subtotal: \$${subtotal.toStringAsFixed(2)}");
-    return buffer.toString().trim();
   }
 }

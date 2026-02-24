@@ -3,43 +3,35 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Base backgrounds
-  static const background = Color(0xFF111214);
-  static const surface = Color(0xFF15171A);
-  static const surface2 = Color(0xFF1B1E22);
+  // Core Dark
+  static const background = Color(0xFF0E1116);
+  static const card = Color(0xFF171B22);
+  static const surface = Color(0xFF1D222B);
 
-  // Paper tones (for search + premium strip)
-  static const paper = Color(0xFFF3EFE6);
-  static const paper2 = Color(0xFFE9E4DA);
+  // Gold Accent
+  static const gold = Color(0xFFC6A34F);
+  static const goldMuted = Color(0xFF9C7F3B);
 
   // Text
-  static const textPrimary = Color(0xFFE6E6E6);
-  static const textMuted = Color.fromRGBO(230, 230, 230, 0.65);
-  static const textDark = Color(0xFF1A1A1A);
-
-  // Accent
-  static const gold = Color(0xFFC9A64B);
-  static const goldBorder = Color.fromRGBO(201, 166, 75, 0.35);
+  static const textPrimary = Color(0xFFFFFFFF);
+  static const textSecondary = Color(0xFFB0B3B8);
+  static const textMuted = Color(0xFF7A808A);
 
   // Borders
-  static const cardBorder = Color.fromRGBO(255, 255, 255, 0.06);
-
-  // Utility
-  static const cartRed = Color(0xFFD24B4B);
-  static const white = Colors.white;
+  static const border = Color(0xFF2A2F38);
 }
 
 class AppSpacing {
-  static const xs = 6.0;
-  static const sm = 10.0;
-  static const md = 16.0;
-  static const lg = 24.0;
-  static const xl = 32.0;
+  static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 16;
+  static const double lg = 24;
+  static const double xl = 32;
 }
 
 class AppRadius {
-  static const sm = 8.0;
-  static const md = 14.0;
-  static const lg = 22.0;
-  static const xl = 28.0;
+  static const double sm = 8;
+  static const double md = 14;
+  static const double lg = 20;
+  static const double pill = 100;
 }
