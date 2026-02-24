@@ -1,17 +1,25 @@
 // lib/services/menu_repository.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product.dart';
 
 class MenuRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<Product>> fetchMenu() async {
-    final configSnap =
-    await _firestore.collection('app_config').doc('main').get();
+  Future<Map<String, int>> fetchWeightTiersCents() async {
+    final snap = await _firestore.collection('app_config').doc('main').get();
+    final data = snap.data() ?? {};
+    final tiers = (data['weightTiers'] as Map<String, dynamic>?) ?? {};
+    return {
+      'gram': (tiers['gram'] ?? 0) as int,
+      'eighth': (tiers['eighth'] ?? 0) as int,
+      'quarter': (tiers['quarter'] ?? 0) as int,
+      'half': (tiers['half'] ?? 0) as int,
+      'oz': (tiers['oz'] ?? 0) as int,
+    };
+  }
 
-    final weightTiers =
-    configSnap.data()?['weightTiers'] as Map<String, dynamic>;
+  Future<List<Product>> fetchMenu() async {
+    final tiers = await fetchWeightTiersCents();
 
     final menuSnap = await _firestore
         .collection('menu_items')
@@ -19,33 +27,26 @@ class MenuRepository {
         .get();
 
     final products = menuSnap.docs.map((doc) {
-      final data = doc.data();
-
+      final d = doc.data();
       return Product(
         id: doc.id,
-        title: data['title'] ?? '',
-        type: data['strain'] ?? '',
-        scent: data['smell'] ?? '',
-        thca: 0, // not stored in Firestore currently
-        effects: [],
-        gramPrice: weightTiers['gram'] ?? 0,
-        eighthPrice: weightTiers['eighth'] ?? 0,
-        quarterPrice: weightTiers['quarter'] ?? 0,
-        halfPrice: weightTiers['half'] ?? 0,
-        ozPrice: weightTiers['oz'] ?? 0,
-        imageKey: doc.id, // maps directly to local asset name
+        title: (d['title'] ?? '') as String,
+        type: (d['strain'] ?? '') as String,
+        scent: (d['smell'] ?? '') as String,
+        thca: 0,
+        effects: const [],
+        gramPrice: tiers['gram'] ?? 0,
+        eighthPrice: tiers['eighth'] ?? 0,
+        quarterPrice: tiers['quarter'] ?? 0,
+        halfPrice: tiers['half'] ?? 0,
+        ozPrice: tiers['oz'] ?? 0,
+        imageKey: doc.id,
       );
     }).toList();
 
     products.sort((a, b) {
-      final aSort = menuSnap.docs
-          .firstWhere((d) => d.id == a.id)
-          .data()['sort'] ?? 0;
-
-      final bSort = menuSnap.docs
-          .firstWhere((d) => d.id == b.id)
-          .data()['sort'] ?? 0;
-
+      final aSort = (menuSnap.docs.firstWhere((x) => x.id == a.id).data()['sort'] ?? 0) as int;
+      final bSort = (menuSnap.docs.firstWhere((x) => x.id == b.id).data()['sort'] ?? 0) as int;
       return aSort.compareTo(bSort);
     });
 

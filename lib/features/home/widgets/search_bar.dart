@@ -1,48 +1,72 @@
 // lib/features/home/widgets/search_bar.dart
-
 import 'package:flutter/material.dart';
 import '../../../theme/tokens.dart';
 
-class HomeSearchBar extends StatelessWidget {
-  const HomeSearchBar({
+class SearchBarWidget extends StatefulWidget {
+  const SearchBarWidget({
     super.key,
-    this.onTap,
-    this.hintText = 'Search products',
+    required this.onChanged,
+    this.initialValue = '',
   });
 
-  final VoidCallback? onTap;
-  final String hintText;
+  final ValueChanged<String> onChanged;
+  final String initialValue;
+
+  @override
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  late final TextEditingController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.paper2,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: AppColors.goldBorder),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.search,
-                color: AppColors.textDark,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                hintText,
-                style: const TextStyle(
-                  color: AppColors.textDark,
-                  fontWeight: FontWeight.w800,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(color: AppColors.border),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: Row(
+          children: [
+            const Icon(Icons.search, color: AppColors.textMuted),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: _c,
+                onChanged: widget.onChanged,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Search strain, scent, type…',
+                  hintStyle: TextStyle(color: AppColors.textMuted),
                 ),
               ),
-            ],
-          ),
+            ),
+            if (_c.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.close, color: AppColors.textMuted),
+                onPressed: () {
+                  _c.clear();
+                  widget.onChanged('');
+                  setState(() {});
+                },
+              ),
+          ],
         ),
       ),
     );

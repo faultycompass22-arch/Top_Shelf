@@ -1,16 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:treefire/components/utils/constants.dart';
-
-class CheckoutPage extends StatelessWidget {
-  const CheckoutPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Center(
-        child: Text('Checkout', style: TextStyle(color: AppColors.text, fontWeight: FontWeight.w900, fontSize: 20)),
-      ),
-    );
+// lib/features/menu/image_key_map.dart
+class ImageKeyMap {
+  static String assetFor(String imageKey) {
+    // Firestore doc ids match asset file names in assets/images/
+    // e.g. blue_nerds -> assets/images/blue_nerds.png
+    return 'assets/images/$imageKey.png';
   }
 }

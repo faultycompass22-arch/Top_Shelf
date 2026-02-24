@@ -1,162 +1,193 @@
+// lib/features/cart/cart_page.dart
 import 'package:flutter/material.dart';
-import 'package:treefire/components/badges/bag_bar.dart';
-import 'package:treefire/components/header/thca_flower_header_bar.dart';
-import 'package:treefire/components/product_card/menu_item_card.dart';
-import 'package:treefire/components/utils/constants.dart';
-import 'package:treefire/components/utils/loading_indicator.dart';
-import 'package:treefire/data/menu_repository.dart';
-import 'package:treefire/features/menu/category_chip_row.dart';
-import 'package:treefire/features/menu/menu_item.dart';
-import 'package:treefire/features/product/product_bottom_sheet.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+import '../../services/cart_service.dart';
+import '../../state/cart_store.dart';
+import '../../theme/tokens.dart';
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  String selectedCategory = 'Flower';
-
-  final categories = const ['Flower', 'Vapes', 'Edibles', 'Concentrates', 'Deals'];
+class CartPage extends StatelessWidget {
+  const CartPage({super.key, required this.cartStore});
+  final CartStore cartStore;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            _TopBar(),
-            const SizedBox(height: 10),
+    return SafeArea(
+      bottom: false,
+      child: AnimatedBuilder(
+        animation: cartStore,
+        builder: (context, _) {
+          final items = cartStore.items;
 
-            // Search bar mock
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.panel2,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.gold2.withValues(alpha: 0.35)),
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Cart',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                 ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.search, color: AppColors.muted),
-                    SizedBox(width: 10),
-                    Expanded(
+                const SizedBox(height: 10),
+
+                if (items.isEmpty)
+                  Expanded(
+                    child: Center(
                       child: Text(
-                        'Search products & strains',
-                        style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600),
+                        'Your cart is empty.\nAdd items from Home.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                    Icon(Icons.add, color: AppColors.gold),
-                  ],
-                ),
-              ),
-            ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) {
+                        final it = items[i];
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.card,
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      it.title,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Weight: ${it.weightKey}',
+                                      style: const TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '\$${(it.priceCents / 100).toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        color: AppColors.gold,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => cartStore.updateQuantity(it, it.quantity - 1),
+                                    icon: const Icon(Icons.remove_circle_outline),
+                                  ),
+                                  Text(
+                                    '${it.quantity}',
+                                    style: const TextStyle(fontWeight: FontWeight.w900),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => cartStore.updateQuantity(it, it.quantity + 1),
+                                    icon: const Icon(Icons.add_circle_outline),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
 
-            const SizedBox(height: 10),
-            CategoryChipRow(
-              categories: categories,
-              selected: selectedCategory,
-              onSelected: (v) => setState(() => selectedCategory = v),
-            ),
+                const SizedBox(height: 10),
 
-            ThcaFlowerHeaderBar(
-              leftTop: 'Top Shelf Certified',
-              leftBottom: 'Premium Indoor',
-              asset: 'assets/images/flower_bar.png',
-            ),
-
-            Expanded(
-              child: StreamBuilder<List<MenuItem>>(
-                stream: MenuRepository.instance.streamMenu(category: selectedCategory),
-                builder: (context, snap) {
-                  if (!snap.hasData) return const LoadingIndicator();
-                  final items = snap.data!;
-
-                  return Stack(
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
                     children: [
-                      GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 86),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.78,
+                      const Text(
+                        'Total',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
                         ),
-                        itemCount: items.length,
-                        itemBuilder: (context, i) {
-                          final item = items[i];
-                          return MenuItemCard(
-                            item: item,
-                            onTap: () => ProductBottomSheet.open(context, item),
-                          );
-                        },
                       ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: BagBar(
-                          onTap: () {
-                            // You can route to cart tab; left as noop here.
-                          },
+                      const Spacer(),
+                      Text(
+                        '\$${(cartStore.totalCents / 100).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16,
+                          color: AppColors.gold,
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+                  ),
+                ),
 
-class _TopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.line),
-              color: AppColors.panel2,
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.border),
+                          foregroundColor: AppColors.textPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                        ),
+                        onPressed: items.isEmpty ? null : () => CartService.callStore(),
+                        child: const Text(
+                          'Call to Order',
+                          style: TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.gold,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                        ),
+                        onPressed: items.isEmpty ? null : () => CartService.sendTextOrder(cartStore),
+                        child: const Text(
+                          'Text to Order',
+                          style: TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            child: const Icon(Icons.menu, color: AppColors.muted, size: 20),
-          ),
-          const Spacer(),
-          const Text(
-            'TREEfire',
-            style: TextStyle(
-              color: AppColors.gold,
-              fontWeight: FontWeight.w900,
-              fontSize: 20,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const Spacer(),
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.line),
-              color: AppColors.panel2,
-            ),
-            child: const Icon(Icons.person_outline, color: AppColors.muted, size: 20),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
