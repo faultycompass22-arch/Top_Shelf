@@ -1,4 +1,3 @@
-// lib/widgets/bottom_nav.dart
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 
@@ -19,7 +18,7 @@ class BottomNav extends StatelessWidget {
     return NavigationBar(
       selectedIndex: index,
       onDestinationSelected: onTap,
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface2,
       indicatorColor: AppColors.surface,
       destinations: [
         const NavigationDestination(
@@ -52,7 +51,7 @@ class BottomNav extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 11,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),

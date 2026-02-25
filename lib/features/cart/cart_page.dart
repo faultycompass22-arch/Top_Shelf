@@ -1,194 +1,166 @@
-// lib/features/cart/cart_page.dart
 import 'package:flutter/material.dart';
-
-import '../../services/cart_service.dart';
+import '../../components/utils/constants.dart';
+import '../../components/utils/launchers.dart';
 import '../../state/cart_store.dart';
 import '../../theme/tokens.dart';
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
   const CartPage({super.key, required this.cartStore});
   final CartStore cartStore;
 
   @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget.cartStore.addListener(_onCart);
+  }
+
+  @override
+  void dispose() {
+    widget.cartStore.removeListener(_onCart);
+    super.dispose();
+  }
+
+  void _onCart() => setState(() {});
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: AnimatedBuilder(
-        animation: cartStore,
-        builder: (context, _) {
-          final items = cartStore.items;
+    final items = widget.cartStore.items;
 
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Cart',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
-                ),
-                const SizedBox(height: 10),
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Cart', style: AppText.h1),
+              const SizedBox(height: 14),
 
-                if (items.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Your cart is empty.\nAdd items from Home.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w700,
+              if (items.isEmpty)
+                Expanded(
+                  child: Center(
+                    child: Text('Cart is empty.', style: AppText.body.copyWith(color: AppColors.muted)),
+                  ),
+                )
+              else
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, i) {
+                      final ci = items[i];
+                      return Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: AppColors.stroke),
                         ),
-                      ),
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) {
-                        final it = items[i];
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.card,
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      it.title,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Weight: ${it.weightKey}',
-                                      style: const TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      '\$${(it.priceCents / 100).toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        color: AppColors.gold,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Row(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  IconButton(
-                                    onPressed: () => cartStore.updateQuantity(it, it.quantity - 1),
-                                    icon: const Icon(Icons.remove_circle_outline),
-                                  ),
+                                  Text(ci.item.title, style: AppText.h3),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    '${it.quantity}',
-                                    style: const TextStyle(fontWeight: FontWeight.w900),
+                                    'Weight: ${ci.grams}g',
+                                    style: AppText.caption.copyWith(color: AppColors.muted),
                                   ),
-                                  IconButton(
-                                    onPressed: () => cartStore.updateQuantity(it, it.quantity + 1),
-                                    icon: const Icon(Icons.add_circle_outline),
-                                  ),
+                                  if ((ci.note ?? '').isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(ci.note!, style: AppText.caption.copyWith(color: AppColors.gold)),
+                                  ],
                                 ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(height: 10),
-
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.card,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Total',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(_money(ci.priceCents), style: AppText.h3.copyWith(color: AppColors.gold)),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              onPressed: () => widget.cartStore.removeAt(i),
+                              icon: const Icon(Icons.close),
+                            ),
+                          ],
                         ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '\$${(cartStore.totalCents / 100).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                          color: AppColors.gold,
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
-                Row(
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface2,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppColors.stroke),
+                ),
+                child: Row(
                   children: [
                     Expanded(
+                      child: Text('Total', style: AppText.h3),
+                    ),
+                    Text(_money(widget.cartStore.totalCents), style: AppText.h3.copyWith(color: AppColors.gold)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 54,
                       child: OutlinedButton(
+                        onPressed: items.isEmpty ? null : () async => launchTel(AppConstants.callPhone),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.border),
-                          foregroundColor: AppColors.textPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                          ),
+                          foregroundColor: AppColors.text,
+                          side: BorderSide(color: AppColors.stroke),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                        onPressed: items.isEmpty ? null : () => CartService.callStore(),
-                        child: const Text(
-                          'Call to Order',
-                          style: TextStyle(fontWeight: FontWeight.w900),
-                        ),
+                        child: const Text('Call to Order'),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 54,
                       child: ElevatedButton(
+                        onPressed: items.isEmpty
+                            ? null
+                            : () async {
+                          final lines = items
+                              .map((x) => '- ${x.item.title} (${x.grams}g) ${_money(x.priceCents)}')
+                              .join('\n');
+                          final msg = 'Order:\n$lines\nTotal: ${_money(widget.cartStore.totalCents)}';
+                          await launchSms(AppConstants.smsPhone, message: msg);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.gold,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                        onPressed: items.isEmpty ? null : () => CartService.sendTextOrder(cartStore),
-                        child: const Text(
-                          'Text to Order',
-                          style: TextStyle(fontWeight: FontWeight.w900),
-                        ),
+                        child: const Text('Text to Order'),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
+
+  String _money(int cents) => '\$${(cents / 100.0).toStringAsFixed(2)}';
 }

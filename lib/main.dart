@@ -1,21 +1,18 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
-import 'app_shell.dart';
+import 'age_gate.dart';
 import 'state/cart_store.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final cartStore = CartStore();
-
-  runApp(TopShelfApp(cartStore: cartStore));
+  runApp(TopShelfApp(cartStore: CartStore()));
 }
 
 class TopShelfApp extends StatelessWidget {
@@ -27,7 +24,8 @@ class TopShelfApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Top Shelf',
-      home: AppShell(cartStore: cartStore),
+      theme: AppTheme.dark(),
+      home: AgeGate(cartStore: cartStore),
     );
   }
 }

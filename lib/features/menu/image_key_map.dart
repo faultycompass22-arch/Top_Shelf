@@ -1,8 +1,13 @@
-// lib/features/menu/image_key_map.dart
 class ImageKeyMap {
-  static String assetFor(String imageKey) {
-    // Firestore doc ids match asset file names in assets/images/
-    // e.g. blue_nerds -> assets/images/blue_nerds.png
-    return 'assets/images/$imageKey.png';
+  static const _known = {
+    'blue_nerds',
+    'fruit_bops',
+    'gelato_41',
+    'maui_wowie',
+  };
+
+  static String assetFor(String id) {
+    if (_known.contains(id)) return 'assets/images/$id.png';
+    return 'assets/images/app_icon.png';
   }
 }

@@ -1,37 +1,20 @@
-// lib/theme/tokens.dart
-
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Core Dark
-  static const background = Color(0xFF0E1116);
-  static const card = Color(0xFF171B22);
-  static const surface = Color(0xFF1D222B);
-
-  // Gold Accent
-  static const gold = Color(0xFFC6A34F);
-  static const goldMuted = Color(0xFF9C7F3B);
-
-  // Text
-  static const textPrimary = Color(0xFFFFFFFF);
-  static const textSecondary = Color(0xFFB0B3B8);
-  static const textMuted = Color(0xFF7A808A);
-
-  // Borders
-  static const border = Color(0xFF2A2F38);
+  static const bg = Color(0xFF0B0E12);
+  static const surface = Color(0xFF111720);
+  static const surface2 = Color(0xFF0F141C);
+  static const stroke = Color(0xFF1B2431);
+  static const muted = Color(0xFF96A3B4);
+  static const text = Color(0xFFEAF0F8);
+  static const gold = Color(0xFFD4B15D);
 }
 
-class AppSpacing {
-  static const double xs = 4;
-  static const double sm = 8;
-  static const double md = 16;
-  static const double lg = 24;
-  static const double xl = 32;
-}
+class AppText {
+  static const h1 = TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.text);
+  static const h2 = TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.text);
+  static const h3 = TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text);
 
-class AppRadius {
-  static const double sm = 8;
-  static const double md = 14;
-  static const double lg = 20;
-  static const double pill = 100;
+  static const body = TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.text);
+  static const caption = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text);
 }

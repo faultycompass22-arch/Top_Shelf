@@ -1,55 +1,38 @@
-// lib/services/menu_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/product.dart';
+import '../menu/menu_item.dart';
 
 class MenuRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  MenuRepository({FirebaseFirestore? db}) : _db = db ?? FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
 
-  Future<Map<String, int>> fetchWeightTiersCents() async {
-    final snap = await _firestore.collection('app_config').doc('main').get();
-    final data = snap.data() ?? {};
-    final tiers = (data['weightTiers'] as Map<String, dynamic>?) ?? {};
-    return {
-      'gram': (tiers['gram'] ?? 0) as int,
-      'eighth': (tiers['eighth'] ?? 0) as int,
-      'quarter': (tiers['quarter'] ?? 0) as int,
-      'half': (tiers['half'] ?? 0) as int,
-      'oz': (tiers['oz'] ?? 0) as int,
-    };
+  Stream<List<MenuItem>> watchFlowerMenu() {
+    return _db.collection('menu_items').snapshots().map((snap) {
+      final items = snap.docs
+          .map((d) => MenuItem.fromFirestore(d.id, d.data()))
+          .where((x) => x.active && x.category.toLowerCase() == 'flower')
+          .toList();
+
+      items.sort((a, b) => a.sort.compareTo(b.sort));
+      return items;
+    });
   }
 
-  Future<List<Product>> fetchMenu() async {
-    final tiers = await fetchWeightTiersCents();
+  Future<Map<num, int>> fetchWeightTiersCents() async {
+    final doc = await _db.collection('app_conf').doc('main').get();
+    final data = doc.data() ?? {};
+    final tiers = (data['weightTiers'] as Map?)?.cast<String, dynamic>() ?? {};
 
-    final menuSnap = await _firestore
-        .collection('menu_items')
-        .where('active', isEqualTo: true)
-        .get();
-
-    final products = menuSnap.docs.map((doc) {
-      final d = doc.data();
-      return Product(
-        id: doc.id,
-        title: (d['title'] ?? '') as String,
-        type: (d['strain'] ?? '') as String,
-        scent: (d['smell'] ?? '') as String,
-        thca: 0,
-        effects: const [],
-        gramPrice: tiers['gram'] ?? 0,
-        eighthPrice: tiers['eighth'] ?? 0,
-        quarterPrice: tiers['quarter'] ?? 0,
-        halfPrice: tiers['half'] ?? 0,
-        ozPrice: tiers['oz'] ?? 0,
-        imageKey: doc.id,
-      );
-    }).toList();
-
-    products.sort((a, b) {
-      final aSort = (menuSnap.docs.firstWhere((x) => x.id == a.id).data()['sort'] ?? 0) as int;
-      final bSort = (menuSnap.docs.firstWhere((x) => x.id == b.id).data()['sort'] ?? 0) as int;
-      return aSort.compareTo(bSort);
+    // keys look like: "1 gram", "3.5 grams", "7 grams", "oz"
+    final out = <num, int>{};
+    tiers.forEach((k, v) {
+      final key = k.toLowerCase().trim();
+      if (key == 'oz') {
+        out[28] = (v as num).toInt();
+        return;
+      }
+      final number = double.tryParse(key.split(' ').first);
+      if (number != null) out[number] = (v as num).toInt();
     });
-
-    return products;
+    return out;
   }
 }
