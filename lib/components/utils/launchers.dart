@@ -13,3 +13,15 @@ Future<void> launchTel(String phone) async {
     throw Exception('Could not launch phone');
   }
 }
+
+// ------------------------------------------------------------
+// Convenience wrappers used by CartService / UI.
+// ------------------------------------------------------------
+
+Future<void> launchTextOrder({required String phone, required String message}) async {
+  await launchSms(phone, message);
+}
+
+Future<void> launchCallOrder({required String phone}) async {
+  await launchTel(phone);
+}

@@ -1,54 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:treefire/components/utils/constants.dart';
+
+import '../../theme/tokens.dart';
 
 class CategoryChipRow extends StatelessWidget {
-  final List<String> categories;
-  final String selected;
-  final ValueChanged<String> onSelected;
-
   const CategoryChipRow({
     super.key,
     required this.categories,
     required this.selected,
-    required this.onSelected,
+    required this.onSelect,
   });
+
+  final List<String> categories;
+  final String selected;
+  final ValueChanged<String> onSelect;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 38,
+      height: 40,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (context, i) {
-          final c = categories[i];
-          final isOn = c == selected;
+          final cat = categories[i];
+          final isSelected = cat == selected;
 
-          return InkWell(
-            onTap: () => onSelected(c),
-            borderRadius: BorderRadius.circular(AppRadii.pill),
+          return GestureDetector(
+            onTap: () => onSelect(cat),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppRadii.pill),
-                color: isOn ? AppColors.gold.withValues(alpha: 0.18) : AppColors.panel2,
+                color: isSelected ? AppColors.gold.withOpacity(0.20) : AppColors.panel,
                 border: Border.all(
-                  color: isOn ? AppColors.gold : AppColors.line,
+                  color: isSelected ? AppColors.gold : AppColors.stroke,
                 ),
+                borderRadius: BorderRadius.circular(AppRadii.pill),
               ),
               child: Text(
-                c,
-                style: TextStyle(
-                  color: isOn ? AppColors.gold : AppColors.muted,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
+                cat,
+                style: AppText.caption.copyWith(
+                  color: isSelected ? AppColors.gold : AppColors.muted,
                 ),
               ),
             ),
           );
         },
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemCount: categories.length,
       ),
     );
   }

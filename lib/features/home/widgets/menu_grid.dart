@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../models/product.dart';
+import '../../../menu/menu_item.dart';
 import 'product_card.dart';
 
 class MenuGrid extends StatelessWidget {
-  final List<Product> items;
+  final List<MenuItem> items;
   const MenuGrid({super.key, required this.items});
 
   @override
@@ -18,7 +18,7 @@ class MenuGrid extends StatelessWidget {
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
-        return ProductCard(product: items[index]);
+        return ProductCard(item: items[index]);
       },
     );
   }
